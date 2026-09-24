@@ -1,54 +1,81 @@
 # EnvGuardAI
 
-AI-assisted data-quality validation and readiness orchestration for integration test environments.
+EnvGuardAI is an intelligent software-quality prototype combining:
 
-This portfolio project is designed around the types of problems described in Ericsson's **Master Thesis: AI-Powered Autonomous Test Environment Orchestration (Job ID 789574)**. It does not contain Ericsson code or data.
+1. data-quality validation for integration test environments
+2. readiness orchestration before test execution
+3. failed-test classification and root-cause analysis
+4. similarity clustering for recurring failures
+5. remediation and guarded self-healing recommendations
 
-## Core capabilities
+It is inspired by the problem areas in Ericsson thesis topics **789574** and **789573**. It contains no Ericsson code, proprietary test logs, or production data.
 
-- validates YAML/JSON environment definitions using typed schemas
-- calculates a data-quality score and structured issues
-- detects missing/invalid fields and cross-field quality problems
-- performs deterministic AI-style repair suggestions without exposing data to an external LLM
-- checks environment readiness before test execution
-- supports optional live HTTP/TCP readiness checks
-- exposes FastAPI endpoints for validation, repair and orchestration
-- includes a Streamlit dashboard
-- includes Docker, Kubernetes manifests and GitHub Actions CI
-- includes Pytest automated tests
+## Main capabilities
 
-## Architecture
+### Environment orchestration
+
+- validates YAML/JSON environment definitions with Pydantic schemas
+- scores configuration data quality and reports structured issues
+- detects missing, inconsistent or risky environment information
+- applies deterministic repair rules and re-validates the result
+- checks service, database, secret and health-readiness conditions
+- supports optional HTTP/TCP live readiness checks
+- exposes orchestration through FastAPI and Streamlit
+- includes Docker, Kubernetes manifests, Pytest and GitHub Actions CI
+
+### Failure intelligence
+
+- parses failed test logs and normalizes volatile identifiers
+- classifies common failures into:
+  - infrastructure
+  - configuration
+  - dependency
+  - flaky-test
+  - resource
+  - application
+  - unknown
+- generates probable root causes and confidence scores
+- creates stable failure signatures for recurring-pattern tracking
+- clusters related failures using TF-IDF and K-Means
+- summarizes recurring failure categories across a batch
+- generates remediation recommendations
+- creates guarded self-healing plans for selected failure types
+
+## Failure-analysis architecture
 
 ```text
-Requirements / environment definition
-                |
-                v
-      +--------------------+
-      | Schema + DQ engine |
-      +----------+---------+
-                 |
-        valid?---+---invalid
-          |             |
-          |             v
-          |      +-------------+
-          |      | Repair agent |
-          |      +------+------+
-          |             |
-          +-------------+
-                 |
-                 v
-       +------------------+
-       | Readiness checks |
-       | services / DB /  |
-       | secrets / health |
-       +--------+---------+
-                |
-                v
-      READY / NOT READY
-                |
-                v
-        Structured report
+Failed test executions
+        |
+        v
+ Log normalization
+        |
+        +----------------------+
+        |                      |
+        v                      v
+Failure classification    TF-IDF vectors
+        |                      |
+        v                      v
+Root-cause hypothesis      K-Means clustering
+        |                      |
+        +-----------+----------+
+                    |
+                    v
+        Recurring failure patterns
+                    |
+                    v
+        Remediation recommendation
+                    |
+                    v
+          Self-healing planner
+                    |
+        +-----------+-----------+
+        |                       |
+    automatic               approval needed
+ guarded retry          config/dependency/
+                        resource changes
 ```
+
+The self-healing layer intentionally uses guardrails. Potentially disruptive actions such as resource changes, dependency restoration or configuration modification are recommendations requiring validation or approval rather than unrestricted autonomous execution.
 
 ## Quick start
 
@@ -59,18 +86,56 @@ python -m venv .venv
 .venv\Scripts\activate
 
 pip install -r requirements.txt
-pytest -q
+python -m pytest -q
 
 uvicorn api:app --reload
 ```
 
-API docs: http://127.0.0.1:8000/docs
+API documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
 
 Dashboard:
 
 ```bash
 streamlit run app.py
 ```
+
+## Failure APIs
+
+### Analyse one failure
+
+`POST /failures/analyze`
+
+Example:
+
+```json
+{
+  "test_name": "payment_api_health",
+  "log": "Connection refused while contacting payment-api:8080",
+  "environment": "integration-01",
+  "retry_count": 1
+}
+```
+
+Returns:
+
+- failure category
+- probable root cause
+- confidence
+- stable signature
+- remediation recommendations
+- guarded self-healing plan
+
+### Analyse a batch
+
+`POST /failures/analyze-batch`
+
+Takes a list of failed test records and returns classifications, similarity clusters, recurring-category counts and an overall summary.
+
+A sample dataset is available in `configs/sample_failures.json`.
 
 ## Docker
 
@@ -85,20 +150,19 @@ Update the image in `k8s/deployment.yaml`, then:
 ```bash
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
-kubectl get pods
-kubectl get svc
 ```
 
 ## CI/CD
 
-`.github/workflows/ci.yml` runs automated tests on pushes and pull requests.
+The GitHub Actions workflow installs dependencies and executes the automated test suite on pushes and pull requests.
 
-## CV-safe project description
+## CV-safe description
 
-**EnvGuardAI — AI-Powered Test Environment Orchestration**  
-Python, FastAPI, Pydantic, Streamlit, Docker, Kubernetes, Pytest
+**EnvGuardAI — AI-Driven Test Failure Analysis & Environment Orchestration**  
+Python, FastAPI, Scikit-learn, Pydantic, Streamlit, Docker, Kubernetes, Pytest
 
-- Built a configuration-quality and readiness orchestration prototype for integration test environments.
-- Implemented typed schema validation, cross-field quality checks, quality scoring and structured repair suggestions for YAML/JSON environment definitions.
-- Developed automated readiness checks for service definitions, container images, database dependencies, secrets and optional live HTTP/TCP health checks.
-- Exposed validation, repair and orchestration through FastAPI, with Streamlit visualization, Docker/Kubernetes deployment and GitHub Actions CI.
+- Built an intelligent test-automation prototype combining environment data-quality validation, readiness orchestration, failed-test analysis and remediation recommendations.
+- Implemented failure classification and root-cause heuristics for infrastructure, configuration, dependency, flaky-test, resource and application failures.
+- Added TF-IDF/K-Means clustering and stable failure signatures to identify related and recurring failures across test executions.
+- Developed guarded self-healing plans for selected failure types, distinguishing safe controlled retries from configuration, dependency and resource changes requiring validation or approval.
+- Exposed workflows through FastAPI and Streamlit with Docker/Kubernetes deployment, Pytest coverage and GitHub Actions CI.
