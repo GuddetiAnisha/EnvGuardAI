@@ -68,3 +68,32 @@ class OrchestrationReport(BaseModel):
     repaired_environment: dict | None = None
     readiness: ReadinessResult | None = None
     recommendation: str
+
+class FailureRecord(BaseModel):
+    test_name: str
+    log: str = Field(min_length=1)
+    environment: Optional[str] = None
+    retry_count: int = Field(default=0, ge=0)
+    metadata: dict[str, str] = {}
+
+class FailureAnalysis(BaseModel):
+    test_name: str
+    category: str
+    probable_root_cause: str
+    confidence: float = Field(ge=0.0, le=1.0)
+    signature: str
+    remediation: list[str]
+    self_heal_action: Optional[str] = None
+    risk: Literal["low", "medium", "high"]
+
+class FailureCluster(BaseModel):
+    cluster_id: int
+    size: int
+    representative_terms: list[str]
+    tests: list[str]
+
+class FailureBatchReport(BaseModel):
+    analyses: list[FailureAnalysis]
+    clusters: list[FailureCluster]
+    recurring_categories: dict[str, int]
+    summary: str
