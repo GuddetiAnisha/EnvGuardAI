@@ -1,0 +1,31 @@
+environment_name: integration-payment-flow
+environment_type: integration
+namespace: payment-it
+required_secrets:
+  - DATABASE_PASSWORD
+  - API_TOKEN
+metadata:
+  owner: integration-team
+  purpose: payment-flow-tests
+services:
+  - name: api
+    image: example/api:1.2.0
+    port: 8080
+    health_path: /health
+    resources:
+      cpu: 0.5
+      memory_mb: 512
+      replicas: 2
+  - name: worker
+    image: example/worker:1.2.0
+    port: 8081
+    health_path: /health
+    resources:
+      cpu: 0.5
+      memory_mb: 256
+      replicas: 1
+database:
+  engine: postgres
+  host: postgres
+  port: 5432
+  persistent_storage_gb: 5
