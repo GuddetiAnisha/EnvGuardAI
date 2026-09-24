@@ -1,0 +1,18 @@
+environment_name: it
+environment_type: integration
+namespace: test
+services:
+  - name: api
+    image: example/api
+    port: 8080
+    resources:
+      cpu: 0.5
+      memory_mb: 64
+      replicas: 1
+  - name: api
+    image: ""
+    port: 8080
+    resources:
+      cpu: 0
+      memory_mb: 128
+      replicas: 0
