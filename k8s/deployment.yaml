@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: envguardai
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: envguardai
+  template:
+    metadata:
+      labels:
+        app: envguardai
+    spec:
+      containers:
+        - name: envguardai
+          image: YOUR_DOCKERHUB_USERNAME/envguardai:1.0.0
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 8
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
