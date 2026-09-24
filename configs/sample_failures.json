@@ -1,0 +1,32 @@
+[
+  {
+    "test_name": "payment_api_health",
+    "log": "requests.exceptions.ConnectionError: connection refused while contacting payment-api:8080",
+    "environment": "integration-01",
+    "retry_count": 1
+  },
+  {
+    "test_name": "user_service_config",
+    "log": "ValidationError: missing config field DATABASE_URL in YAML environment definition",
+    "environment": "integration-01",
+    "retry_count": 0
+  },
+  {
+    "test_name": "analytics_import",
+    "log": "ModuleNotFoundError: No module named 'analytics_client'",
+    "environment": "integration-02",
+    "retry_count": 0
+  },
+  {
+    "test_name": "payment_api_retry",
+    "log": "HTTPConnectionPool: connection refused to payment-api after timeout",
+    "environment": "integration-02",
+    "retry_count": 2
+  },
+  {
+    "test_name": "large_dataset_test",
+    "log": "RuntimeError: out of memory while allocating test dataset",
+    "environment": "performance-01",
+    "retry_count": 0
+  }
+]
