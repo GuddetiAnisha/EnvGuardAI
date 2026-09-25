@@ -8,15 +8,22 @@ from envguard.repair import repair_environment
 from envguard.orchestrator import orchestrate
 from envguard.failure_intelligence import analyze_batch, analyze_failure, self_heal_plan
 from envguard.models import FailureRecord
+from envguard.production_verification import (
+    ProductionTestResult,
+    RequirementSpec,
+    verify_production_results,
+)
 
 st.set_page_config(page_title="EnvGuardAI", layout="wide")
 st.title("EnvGuardAI")
 st.caption(
-    "Data-quality validation, test-environment orchestration, "
-    "failure analysis and guarded self-healing recommendations."
+    "Data-quality validation, test-environment orchestration, failure intelligence, "
+    "and AI-assisted production test verification."
 )
 
-tab1, tab2 = st.tabs(["Environment Orchestration", "Failure Intelligence"])
+tab1, tab2, tab3 = st.tabs(
+    ["Environment Orchestration", "Failure Intelligence", "Production Verification"]
+)
 
 with tab1:
     default_path = Path("configs/invalid_environment.yaml")
@@ -120,3 +127,74 @@ with tab2:
         st.dataframe(report["analyses"], use_container_width=True)
         st.subheader("Similarity Clusters")
         st.dataframe(report["clusters"], use_container_width=True)
+
+with tab3:
+    req_path = Path("configs/sample_requirements.json")
+    res_path = Path("configs/sample_production_results.json")
+    default_req = req_path.read_text(encoding="utf-8") if req_path.exists() else "[]"
+    default_res = res_path.read_text(encoding="utf-8") if res_path.exists() else "[]"
+
+    left, right = st.columns(2)
+    with left:
+        req_raw = st.text_area("Requirements (JSON)", default_req, height=360)
+    with right:
+        res_raw = st.text_area("Production test results (JSON)", default_res, height=360)
+
+    threshold = st.slider(
+        "AI-assisted parameter matching threshold",
+        min_value=0.40,
+        max_value=1.00,
+        value=0.62,
+        step=0.01,
+        help="Exact matches always win. Similarity matching is only used when names differ.",
+    )
+
+    try:
+        requirements = [
+            RequirementSpec.model_validate(x) for x in json.loads(req_raw)
+        ]
+        production_results = [
+            ProductionTestResult.model_validate(x) for x in json.loads(res_raw)
+        ]
+    except Exception as exc:
+        st.error(f"Invalid production verification input: {exc}")
+        requirements = []
+        production_results = []
+
+    if st.button(
+        "Verify Production Results",
+        use_container_width=True,
+        disabled=not requirements,
+    ):
+        report = verify_production_results(
+            requirements,
+            production_results,
+            similarity_threshold=threshold,
+        )
+        st.session_state["production_verification"] = report.model_dump()
+
+    if "production_verification" in st.session_state:
+        report = st.session_state["production_verification"]
+        st.subheader("Verification Summary")
+        st.info(report["summary"])
+
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Passed", report["passed"])
+        c2.metric("Deviations", report["deviations"])
+        c3.metric("Missing Results", report["missing_results"])
+        c4.metric("Unit Mismatches", report["unit_mismatches"])
+
+        findings = report["findings"]
+        deviations = [
+            f for f in findings
+            if f["result"] in {"deviation", "missing_result", "unit_mismatch", "error"}
+        ]
+
+        st.subheader("Detected Deviations")
+        if deviations:
+            st.dataframe(deviations, use_container_width=True)
+        else:
+            st.success("No deviations detected.")
+
+        st.subheader("Requirement-to-Test Traceability")
+        st.dataframe(findings, use_container_width=True)
