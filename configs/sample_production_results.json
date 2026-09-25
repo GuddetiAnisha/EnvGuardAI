@@ -1,0 +1,26 @@
+[
+  {
+    "test_id": "TX-POWER-001",
+    "parameter": "output power",
+    "value": 38.4,
+    "unit": "dBm",
+    "status": "completed",
+    "metadata": {"build": "demo-2026.09", "station": "PT-01"}
+  },
+  {
+    "test_id": "EVM-001",
+    "parameter": "EVM RMS",
+    "value": 2.4,
+    "unit": "%",
+    "status": "completed",
+    "metadata": {"build": "demo-2026.09", "station": "PT-01"}
+  },
+  {
+    "test_id": "TEMP-001",
+    "parameter": "Operating Temperature",
+    "value": 25,
+    "unit": "F",
+    "status": "completed",
+    "metadata": {"build": "demo-2026.09", "station": "PT-02"}
+  }
+]
