@@ -1,0 +1,43 @@
+[
+  {
+    "requirement_id": "REQ-TX-001",
+    "parameter": "Output Power",
+    "operator": "ge",
+    "expected": 39.0,
+    "unit": "dBm",
+    "tolerance": 0.2,
+    "source_document": "Demo Radio Production Specification",
+    "source_section": "5.2 Transmit Power",
+    "description": "Minimum conducted output power."
+  },
+  {
+    "requirement_id": "REQ-EVM-002",
+    "parameter": "EVM RMS",
+    "operator": "le",
+    "expected": 3.0,
+    "unit": "%",
+    "source_document": "Demo Radio Production Specification",
+    "source_section": "5.3 Modulation Quality",
+    "description": "Maximum allowed RMS EVM."
+  },
+  {
+    "requirement_id": "REQ-RX-003",
+    "parameter": "Receiver Sensitivity",
+    "operator": "le",
+    "expected": -100.0,
+    "unit": "dBm",
+    "source_document": "Demo Radio Production Specification",
+    "source_section": "6.1 Receiver",
+    "description": "Receiver sensitivity threshold."
+  },
+  {
+    "requirement_id": "REQ-TEMP-004",
+    "parameter": "Operating Temperature",
+    "operator": "between",
+    "expected": [-10, 55],
+    "unit": "C",
+    "source_document": "Demo Radio Production Specification",
+    "source_section": "7.4 Environmental",
+    "description": "Allowed operating temperature range."
+  }
+]
