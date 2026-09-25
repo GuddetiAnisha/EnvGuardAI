@@ -166,3 +166,62 @@ Python, FastAPI, Scikit-learn, Pydantic, Streamlit, Docker, Kubernetes, Pytest
 - Added TF-IDF/K-Means clustering and stable failure signatures to identify related and recurring failures across test executions.
 - Developed guarded self-healing plans for selected failure types, distinguishing safe controlled retries from configuration, dependency and resource changes requiring validation or approval.
 - Exposed workflows through FastAPI and Streamlit with Docker/Kubernetes deployment, Pytest coverage and GitHub Actions CI.
+
+
+## Production test verification extension
+
+EnvGuardAI now includes a focused production-test verification workflow inspired by industrial verification use cases.
+
+### What it does
+
+- ingests structured requirements and reported production test results
+- matches requirement parameters to test-result parameters using exact matching first and similarity matching when names differ
+- applies deterministic checks for equality, minimum/maximum thresholds, numeric ranges, substring checks and regular-expression checks
+- detects deviations, missing test results and unit mismatches
+- preserves traceability to requirement ID, source document and source section
+- exposes results through both FastAPI and Streamlit
+- includes synthetic sample data with deliberately introduced deviations
+- includes automated Pytest coverage for matching, deviation detection, traceability, missing results, unit consistency and tolerance checks
+
+### Production verification API
+
+`POST /production/verify`
+
+Example payload:
+
+```json
+{
+  "requirements": [
+    {
+      "requirement_id": "REQ-TX-001",
+      "parameter": "Output Power",
+      "operator": "ge",
+      "expected": 39.0,
+      "unit": "dBm",
+      "tolerance": 0.2,
+      "source_document": "Demo Radio Production Specification",
+      "source_section": "5.2 Transmit Power"
+    }
+  ],
+  "results": [
+    {
+      "test_id": "TX-POWER-001",
+      "parameter": "output power",
+      "value": 38.4,
+      "unit": "dBm"
+    }
+  ],
+  "similarity_threshold": 0.62
+}
+```
+
+The response includes per-requirement findings with expected and observed values, pass/deviation status, source traceability, match method, and match confidence.
+
+Sample files:
+
+- `configs/sample_requirements.json`
+- `configs/sample_production_results.json`
+
+### Updated CV-safe bullet
+
+- Extended EnvGuardAI with a production-test verification module that reconciles structured requirements with reported test results, applies deterministic checks, detects deviations/missing results/unit mismatches, and preserves source-level requirement traceability.
