@@ -10,6 +10,16 @@ EnvGuardAI is an intelligent software-quality prototype combining:
 
 It is inspired by the problem areas in Ericsson thesis topics **789574** and **789573**. It contains no Ericsson code, proprietary test logs, or production data.
 
+## Verified status
+
+The current implementation has been validated locally:
+
+- **12/12 automated tests passed** (`12 passed in 1.10s`).
+- The Streamlit app launched successfully.
+- Environment Orchestration, Failure Intelligence, and Production Verification were exercised interactively.
+- A representative `payment_api_health` failure was classified as `infrastructure` with 70% confidence and MEDIUM risk, with root-cause guidance, a stable signature, remediation steps, and a readiness-gated self-healing retry plan.
+- Detailed validation notes are available in `RESULTS.md`.
+
 ## Main capabilities
 
 ### Environment orchestration
